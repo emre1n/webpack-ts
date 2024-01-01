@@ -79,7 +79,7 @@ Update the `src` of `script` tag in the `index.html` with `bundle.js` in the `di
 pnpm start
 ```
 
-## Adding source maps
+## Add source maps
 
 Source maps will basically take that minified bundle and map it backwards to its prebuilt state so that the actual code that makes up that bundle can be seen where it is coming from.
 
@@ -111,9 +111,19 @@ Add the `devtool: 'inline-source-map'` in `webpack.config.js` file, to extract t
 
 Restart server
 
-## Adding Webpack development server configuration
+## Add Webpack development server configuration
 
-add `devServer` property to `webpack.config.js`
+Add `mode: 'development'` to `webpack.config.js`,
+
+In order to switch from `lite-server` to Webpack dev server;
+
+Install `webpack-dev-server`,
+
+```bash
+pnpm add -D webpack-dev-server
+```
+
+Add `devServer` property to `webpack.config.js`
 
 ```javascript
 entry: './src/index.ts',
@@ -122,5 +132,26 @@ entry: './src/index.ts',
     static: {
       directory: path.join(__dirname, './'),
     },
+  },
+```
+
+Add `serve` script to `package.json`
+Replace it with `start` script which starts the server with `lite-server`.
+
+```JSON
+{
+    "scripts": {
+        "serve": "webpack serve"
+    }
+}
+```
+
+Add `publicPath` property to `webpack.config.js` file
+
+```javascript
+  output: {
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: '/dist',
   },
 ```
