@@ -155,3 +155,82 @@ Add `publicPath` property to `webpack.config.js` file
     publicPath: '/dist',
   },
 ```
+
+## Add Webpack production server configuration
+
+Add a file `webpack.config.prod.js` to root directory
+
+Copy and paste the content of the original `webpack.config.js` file into the `webpack.config.prod.js`
+
+Rename the `mode` from `development` to `production`
+
+Update the `build` script in `package.json` pointing the `webpack.config.prod.js` file using the `--config` option.
+
+```JSON
+  "scripts": {
+    "serve": "webpack serve",
+    "build": "webpack --config webpack.config.prod.js"
+  },
+```
+
+To differentiate each build after making changes to the source code, update the `filename` of the `output` property of the `webpack.config.prod.js` with `[contenthash]` prefix.
+
+This is important for the browser to catch when there is a change in the bundle file.
+
+```javascript
+  output: {
+    filename: '[contenthash].bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: '/dist',
+  },
+```
+
+Now each build file will start with a different hash.
+
+To clean the old build files, [clean-webpack-plugin](https://www.npmjs.com/package/clean-webpack-plugin) will be used.
+
+It will automatically empty out the `dist` directory everytime there is a new build instead of adding on.
+
+Install `clean-webpack-plugin`
+
+```bash
+pnpm add -D clean-webpack-plugin
+```
+
+Go to `webpack.config.prod.js` require the plugin.
+
+```javascript
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+```
+
+Add a `plugins` section to the config.
+
+```javascript
+  plugins: [
+    /**
+     * All files inside webpack's output.path directory will be removed once, but the
+     * directory itself will not be. If using webpack 4+'s default configuration,
+     * everything under <PROJECT_DIR>/dist/ will be removed.
+     * Use cleanOnceBeforeBuildPatterns to override this behavior.
+     *
+     * During rebuilds, all webpack assets that are not used anymore
+     * will be removed automatically.
+     *
+     * See `Options and Defaults` for information
+     */
+    new CleanWebpackPlugin(),
+  ],
+```
+
+At the end undo the [contenthash] to keep it clean for future reference.
+Since the script source of the `index.html` is just `bundle.js`.
+
+Rename the `webpack.config.js` to `webpack.config.dev.js`
+And in `package.json` update the script, no longer the default config file but pointing the `webpack.config.dev.js` file.
+
+```JSON
+  "scripts": {
+    "serve": "webpack serve --config webpack.config.dev.js",
+    "build": "webpack --config webpack.config.prod.js"
+  },
+```
